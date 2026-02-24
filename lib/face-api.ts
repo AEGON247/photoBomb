@@ -7,6 +7,7 @@ const MODEL_URL = '/models';
 class FaceApiService {
     private modelsLoaded = false;
     private faceapi: any = null;
+    private tfReady = false;
 
     async getFaceApi() {
         if (this.faceapi) return this.faceapi;
@@ -14,8 +15,27 @@ class FaceApiService {
         return this.faceapi;
     }
 
+    private async ensureTfBackend() {
+        if (this.tfReady) return;
+
+        // face-api.js relies on TFJS; Next bundling can exclude backends unless imported.
+        const tf = await import("@tensorflow/tfjs-core");
+        await import("@tensorflow/tfjs-backend-webgl");
+        await import("@tensorflow/tfjs-backend-cpu");
+
+        // Prefer WebGL for speed; fall back to CPU if WebGL isn't available.
+        try {
+            await tf.setBackend("webgl");
+        } catch {
+            await tf.setBackend("cpu");
+        }
+        await tf.ready();
+        this.tfReady = true;
+    }
+
     async loadModels() {
         if (this.modelsLoaded) return;
+        await this.ensureTfBackend();
         const faceapi = await this.getFaceApi();
 
         try {
