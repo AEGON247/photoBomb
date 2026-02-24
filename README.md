@@ -1,6 +1,6 @@
-## FaceFinder
+## PhotoBomb
 
-FaceFinder is a SaaS-oriented web app (Next.js + Firebase) that lets users:
+PhotoBomb is a SaaS-oriented web app (Next.js + Firebase) that lets users:
 
 - **Connect with Google** using Firebase Authentication.
 - **Paste a Google Drive folder link** that they already have access to.
@@ -69,7 +69,7 @@ npm run dev
 
 ### 4. Deployment (SaaS-style)
 
-You can deploy FaceFinder as a multi-tenant SaaS by deploying this app to a host such as **Vercel** or another Node-capable platform.
+You can deploy PhotoBomb as a multi-tenant SaaS by deploying this app to a host such as **Vercel** or another Node-capable platform.
 
 At a high level:
 
