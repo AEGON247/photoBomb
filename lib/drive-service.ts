@@ -40,6 +40,7 @@ export const listFiles = async (accessToken: string, query: string, pageSize: nu
 export const getFileMetadata = async (accessToken: string, fileId: string): Promise<DriveFile> => {
     const params = new URLSearchParams({
         fields: "id,name,mimeType,thumbnailLink,parents",
+        includeItemsFromAllDrives: "true",
         supportsAllDrives: "true",
     });
 
@@ -51,7 +52,14 @@ export const getFileMetadata = async (accessToken: string, fileId: string): Prom
     });
 
     if (!response.ok) {
-        throw new Error(`Drive API Error: ${response.status} ${response.statusText}`);
+        let errorData = "Unknown error";
+        try {
+            const errJson = await response.json();
+            errorData = JSON.stringify(errJson);
+        } catch (e) {
+            errorData = await response.text();
+        }
+        throw new Error(`Drive API Error: ${response.status} ${response.statusText} - Details: ${errorData}`);
     }
 
     return response.json();

@@ -6,6 +6,8 @@ interface ScanResult {
     name: string;
     thumbnailLink: string;
     similarity: number;
+    descriptor: Float32Array; // Stored so we can submit feedback on it
+    imageUrl?: string; // Local blob URL for bypass auth restriction
 }
 
 interface ScanState {

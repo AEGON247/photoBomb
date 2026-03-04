@@ -9,8 +9,10 @@ import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/componen
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { AlertCircle, CheckCircle2, Link2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export function DriveLinkInput() {
+  const router = useRouter();
   const { accessToken } = useAuthStore();
   const { setSelectedFolder, setCurrentFolder } = useDriveStore();
 
@@ -21,8 +23,7 @@ export function DriveLinkInput() {
 
   const handleApply = async () => {
     if (!accessToken) {
-      setStatus("error");
-      setMessage("Connect Google Drive on the login page before pasting a link.");
+      router.push("/login");
       return;
     }
 
@@ -119,7 +120,7 @@ export function DriveLinkInput() {
         )}
       </CardContent>
       <CardFooter className="border-t border-slate-800 text-xs text-slate-500 flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-        <span>Tip: You can create a dedicated Drive folder for all photos you want FaceFinder to search.</span>
+        <span>Tip: You can create a dedicated Drive folder for all photos you want PhotoBomb to search.</span>
         <span>Only folders you can already access via your Google account can be scanned.</span>
       </CardFooter>
     </Card>

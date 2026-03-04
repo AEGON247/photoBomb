@@ -1,6 +1,6 @@
 
 // We don't import face-api.js at top level to avoid SSR issues
-// import * as faceapi from 'face-api.js'; 
+// import * as faceapi from '@vladmandic/face-api'; 
 
 const MODEL_URL = '/models';
 
@@ -10,7 +10,7 @@ class FaceApiService {
 
     async getFaceApi() {
         if (this.faceapi) return this.faceapi;
-        this.faceapi = await import('face-api.js');
+        this.faceapi = await import('@vladmandic/face-api');
         return this.faceapi;
     }
 
@@ -19,7 +19,12 @@ class FaceApiService {
         const faceapi = await this.getFaceApi();
 
         try {
-            await faceapi.loadTinyFaceDetectorModel(MODEL_URL);
+            // Explicitly set the backend and wait for it to be ready
+            await faceapi.tf.setBackend('webgl');
+            await faceapi.tf.ready();
+
+            // Load SSD Mobilenet V1 instead of Tiny Face Detector for higher accuracy
+            await faceapi.loadSsdMobilenetv1Model(MODEL_URL);
             await faceapi.loadFaceLandmarkModel(MODEL_URL);
             await faceapi.loadFaceRecognitionModel(MODEL_URL);
             this.modelsLoaded = true;
@@ -34,8 +39,8 @@ class FaceApiService {
         if (!this.modelsLoaded) await this.loadModels();
         const faceapi = await this.getFaceApi();
 
-        // Use Tiny Face Detector for speed
-        const detection = await faceapi.detectSingleFace(image, new faceapi.TinyFaceDetectorOptions())
+        // Use SSD Mobilenet V1 for much higher accuracy
+        const detection = await faceapi.detectSingleFace(image, new faceapi.SsdMobilenetv1Options({ minConfidence: 0.5 }))
             .withFaceLandmarks()
             .withFaceDescriptor();
 
@@ -46,7 +51,7 @@ class FaceApiService {
         if (!this.modelsLoaded) await this.loadModels();
         const faceapi = await this.getFaceApi();
 
-        return await faceapi.detectAllFaces(image, new faceapi.TinyFaceDetectorOptions())
+        return await faceapi.detectAllFaces(image, new faceapi.SsdMobilenetv1Options({ minConfidence: 0.5 }))
             .withFaceLandmarks()
             .withFaceDescriptors();
     }

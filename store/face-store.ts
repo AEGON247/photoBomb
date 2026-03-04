@@ -1,15 +1,24 @@
 import { create } from 'zustand';
 
+export interface FaceReference {
+    descriptor: Float32Array;
+    image: string; // URL or Base64
+}
+
 interface FaceState {
-    referenceDescriptor: Float32Array | null;
-    referenceImage: string | null; // URL or Base64
-    setReference: (descriptor: Float32Array, image: string) => void;
-    clearReference: () => void;
+    references: FaceReference[];
+    addReference: (descriptor: Float32Array, image: string) => void;
+    removeReference: (index: number) => void;
+    clearReferences: () => void;
 }
 
 export const useFaceStore = create<FaceState>((set) => ({
-    referenceDescriptor: null,
-    referenceImage: null,
-    setReference: (descriptor, image) => set({ referenceDescriptor: descriptor, referenceImage: image }),
-    clearReference: () => set({ referenceDescriptor: null, referenceImage: null }),
+    references: [],
+    addReference: (descriptor, image) => set((state) => ({
+        references: [...state.references, { descriptor, image }]
+    })),
+    removeReference: (index) => set((state) => ({
+        references: state.references.filter((_, i) => i !== index)
+    })),
+    clearReferences: () => set({ references: [] }),
 }));

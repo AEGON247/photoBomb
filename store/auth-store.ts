@@ -61,7 +61,7 @@ if (auth) {
                 // (securely?) - but for client-side apps, usually we just keep it in memory state.
                 // If the user reloads, they might need to sign in again to grant drive access 
                 // OR we use the refresh token if we had a backend.
-                // Since this is client-side only FaceFinder, we will prompt login if token is missing.
+                // Since this is client-side only PhotoBomb, we will prompt login if token is missing.
             });
         }
     });

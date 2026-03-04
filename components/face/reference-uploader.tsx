@@ -6,11 +6,11 @@ import { faceApiService } from "@/lib/face-api";
 import { useFaceStore } from "@/store/face-store";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Loader2, Upload, User, Check, X, Camera } from "lucide-react";
+import { Loader2, Upload, User, Check, X, Camera, Plus, Trash2 } from "lucide-react";
 import Image from "next/image";
 
 export function ReferenceUploader() {
-    const { setReference, referenceImage, clearReference } = useFaceStore();
+    const { references, addReference, removeReference, clearReferences } = useFaceStore();
     const [detecting, setDetecting] = useState(false);
     const [preview, setPreview] = useState<string | null>(null);
     const [faces, setFaces] = useState<any[]>([]); // Descriptors/Landmarks
@@ -19,9 +19,12 @@ export function ReferenceUploader() {
     const videoRef = useRef<HTMLVideoElement | null>(null);
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
+    const MAX_REFERENCES = 3;
+
     // Start/stop camera when mode changes
     useEffect(() => {
         let currentStream: MediaStream | null = null;
+        let isActive = true;
 
         const startCamera = async () => {
             if (!navigator.mediaDevices?.getUserMedia) return;
@@ -30,14 +33,27 @@ export function ReferenceUploader() {
                     video: { facingMode: "user" },
                     audio: false,
                 });
+
+                if (!isActive) {
+                    stream.getTracks().forEach((t) => t.stop());
+                    return;
+                }
+
                 currentStream = stream;
                 if (videoRef.current) {
                     videoRef.current.srcObject = stream;
-                    await videoRef.current.play();
+                    try {
+                        await videoRef.current.play();
+                    } catch (playError: any) {
+                        // Ignore AbortError which happens when the play request is interrupted by a new load request
+                        if (playError.name !== 'AbortError') {
+                            console.error("Error playing video:", playError);
+                        }
+                    }
                 }
             } catch (err) {
                 console.error("Could not access camera", err);
-                setMode("upload");
+                if (isActive) setMode("upload");
             }
         };
 
@@ -58,6 +74,7 @@ export function ReferenceUploader() {
         }
 
         return () => {
+            isActive = false;
             stopCamera();
         };
     }, [mode]);
@@ -98,88 +115,71 @@ export function ReferenceUploader() {
 
     const confirmSelection = () => {
         if (selectedFaceIndex === null || !faces[selectedFaceIndex] || !preview) return;
+        if (references.length >= MAX_REFERENCES) return;
 
         const face = faces[selectedFaceIndex];
-        // We might want to crop the face for the storage reference image
-        // For now, just storing the full image URL and the descriptor
-        // Ideally we should store the descriptor as a plain array (Float32Array)
-        setReference(face.descriptor, preview);
-    };
+        addReference(face.descriptor, preview);
 
-    const reset = () => {
+        // Reset preview state so they can add another
         setPreview(null);
         setFaces([]);
         setSelectedFaceIndex(null);
-        clearReference();
     };
 
-    if (referenceImage) {
-        return (
-            <Card className="w-full max-w-xl mx-auto bg-slate-900 border-slate-800">
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-blue-400">
-                        <Check className="w-5 h-5" />
-                        Reference Face Set
-                    </CardTitle>
-                </CardHeader>
-                <CardContent className="flex flex-col items-center gap-4">
-                    <div className="relative w-32 h-32 rounded-full overflow-hidden border-4 border-blue-500 shadow-xl shadow-blue-900/20">
-                        {/* In a real app we'd crop this to the face. using object-cover for now */}
-                        <img src={referenceImage} alt="Reference" className="w-full h-full object-cover" />
-                    </div>
-                    <Button variant="outline" onClick={reset} className="border-slate-700 text-slate-300 hover:text-white">
-                        Change Reference Photo
-                    </Button>
-                </CardContent>
-            </Card>
-        )
-    }
+    const resetPreview = () => {
+        setPreview(null);
+        setFaces([]);
+        setSelectedFaceIndex(null);
+    };
+
+    const resetAll = () => {
+        resetPreview();
+        clearReferences();
+    };
 
     return (
         <Card className="w-full max-w-xl mx-auto bg-slate-900 border-slate-800">
-                <CardHeader>
-                    <div className="flex items-center justify-between">
-                        <CardTitle className="text-slate-100">Choose Reference Face</CardTitle>
-                        <div className="inline-flex rounded-full bg-slate-800 p-1 text-xs">
-                            <button
-                                type="button"
-                                onClick={() => {
-                                    setMode("camera");
-                                    setPreview(null);
-                                    setFaces([]);
-                                    setSelectedFaceIndex(null);
-                                }}
-                                className={`px-3 py-1 rounded-full transition-colors flex items-center gap-1 ${
-                                    mode === "camera"
-                                        ? "bg-blue-600 text-white"
-                                        : "text-slate-300 hover:text-white"
+            <CardHeader>
+                <div className="flex items-center justify-between">
+                    <CardTitle className="text-slate-100">Choose Reference Face</CardTitle>
+                    <div className="inline-flex rounded-full bg-slate-800 p-1 text-xs">
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setMode("camera");
+                                setPreview(null);
+                                setFaces([]);
+                                setSelectedFaceIndex(null);
+                            }}
+                            className={`px-3 py-1 rounded-full transition-colors flex items-center gap-1 ${mode === "camera"
+                                ? "bg-blue-600 text-white"
+                                : "text-slate-300 hover:text-white"
                                 }`}
-                            >
-                                <Camera className="w-3 h-3" />
-                                Live scan
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() => {
-                                    setMode("upload");
-                                    setPreview(null);
-                                    setFaces([]);
-                                    setSelectedFaceIndex(null);
-                                }}
-                                className={`px-3 py-1 rounded-full transition-colors ${
-                                    mode === "upload"
-                                        ? "bg-blue-600 text-white"
-                                        : "text-slate-300 hover:text-white"
+                        >
+                            <Camera className="w-3 h-3" />
+                            Live scan
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setMode("upload");
+                                setPreview(null);
+                                setFaces([]);
+                                setSelectedFaceIndex(null);
+                            }}
+                            className={`px-3 py-1 rounded-full transition-colors ${mode === "upload"
+                                ? "bg-blue-600 text-white"
+                                : "text-slate-300 hover:text-white"
                                 }`}
-                            >
-                                Upload
-                            </button>
-                        </div>
+                        >
+                            Upload
+                        </button>
                     </div>
-                </CardHeader>
+                </div>
+            </CardHeader>
             <CardContent>
-                {!preview && mode === "camera" && (
-                    <div className="space-y-4">
+                {mode === "camera" && (
+                    <div className={`space-y-4 ${preview ? 'hidden' : 'block'}`}>
                         <div className="relative rounded-lg overflow-hidden bg-black h-72 flex items-center justify-center">
                             <video
                                 ref={videoRef}
@@ -250,11 +250,10 @@ export function ReferenceUploader() {
                 {!preview && mode === "upload" && (
                     <div
                         {...getRootProps()}
-                        className={`border-2 border-dashed rounded-lg p-10 flex flex-col items-center justify-center cursor-pointer transition-colors ${
-                            isDragActive
-                                ? "border-blue-500 bg-blue-500/10"
-                                : "border-slate-700 hover:border-slate-600"
-                        }`}
+                        className={`border-2 border-dashed rounded-lg p-10 flex flex-col items-center justify-center cursor-pointer transition-colors ${isDragActive
+                            ? "border-blue-500 bg-blue-500/10"
+                            : "border-slate-700 hover:border-slate-600"
+                            }`}
                     >
                         <input {...getInputProps()} />
                         <Upload className="w-10 h-10 text-slate-500 mb-4" />
@@ -317,7 +316,7 @@ export function ReferenceUploader() {
             </CardContent>
             {preview && !detecting && faces.length > 0 && (
                 <CardFooter className="flex justify-between border-t border-slate-800 pt-4">
-                    <Button variant="ghost" onClick={() => setPreview(null)} className="text-slate-400">Cancel</Button>
+                    <Button variant="ghost" onClick={resetPreview} className="text-slate-400">Cancel</Button>
                     <Button onClick={confirmSelection} disabled={selectedFaceIndex === null} className="bg-blue-600 hover:bg-blue-700">
                         Use This Face
                     </Button>

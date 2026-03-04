@@ -1,5 +1,6 @@
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -14,15 +15,16 @@ const firebaseConfig = {
 let app: any;
 let auth: any;
 let googleProvider: any;
+let db: any;
 
 if (typeof window !== 'undefined') {
   app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
   auth = getAuth(app);
   googleProvider = new GoogleAuthProvider();
+  db = getFirestore(app);
 
   // Add scopes for Google Drive
-  googleProvider.addScope('https://www.googleapis.com/auth/drive.readonly');
-  googleProvider.addScope('https://www.googleapis.com/auth/drive.metadata.readonly');
+  googleProvider.addScope('https://www.googleapis.com/auth/drive');
 }
 
-export { app, auth, googleProvider };
+export { app, auth, googleProvider, db };

@@ -1,7 +1,9 @@
 "use client";
 
+import { useEffect } from "react";
 import { AuthGuard } from "@/components/auth/auth-guard";
 import { useAuthStore } from "@/store/auth-store";
+import { useFeedbackStore } from "@/store/feedback-store";
 import { Button } from "@/components/ui/button";
 import { LogOut } from "lucide-react";
 import { DriveLinkInput } from "@/components/drive/drive-link-input";
@@ -11,6 +13,14 @@ import { ResultsGallery } from "@/components/gallery/results-gallery";
 
 export default function DashboardPage() {
     const { logout, user } = useAuthStore();
+    const { loadFeedback } = useFeedbackStore();
+
+    // Load user's custom AI feedback data on mount
+    useEffect(() => {
+        if (user) {
+            loadFeedback();
+        }
+    }, [user, loadFeedback]);
 
     return (
         <AuthGuard>
@@ -25,35 +35,51 @@ export default function DashboardPage() {
                         Sign Out
                     </Button>
                 </header>
-                <main className="flex flex-col items-center justify-center space-y-8 mt-12 pb-24">
-                    {/* Step 1: Folder Selection */}
-                    <div className="w-full max-w-3xl space-y-4">
-                        <div className="text-center space-y-2">
-                            <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-linear-to-r from-blue-400 to-purple-400">
-                                1. Paste Google Drive folder link
-                            </h2>
+                <main className="max-w-[1600px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 mt-8 pb-24">
+
+                    {/* Left Column: Control Panel */}
+                    <div className="lg:col-span-4 space-y-6">
+                        <div className="bg-card border border-border rounded-xl p-6 shadow-xl relative overflow-hidden">
+                            {/* Decorative background glow */}
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 blur-[50px] rounded-full pointer-events-none" />
+
+                            <div className="space-y-8 relative z-10">
+                                {/* Step 1: Folder Selection */}
+                                <div className="space-y-4">
+                                    <h2 className="text-lg font-bold flex items-center gap-2">
+                                        <span className="bg-primary/20 text-primary w-6 h-6 rounded-full flex items-center justify-center text-sm">1</span>
+                                        Target Folder
+                                    </h2>
+                                    <DriveLinkInput />
+                                </div>
+
+                                <div className="h-px w-full bg-border" />
+
+                                {/* Step 2: Face Reference */}
+                                <div className="space-y-4">
+                                    <h2 className="text-lg font-bold flex items-center gap-2">
+                                        <span className="bg-primary/20 text-primary w-6 h-6 rounded-full flex items-center justify-center text-sm">2</span>
+                                        Reference Face
+                                    </h2>
+                                    <ReferenceUploader />
+                                </div>
+                            </div>
                         </div>
-                        <DriveLinkInput />
                     </div>
 
-                    {/* Step 2: Face Reference */}
-                    <div className="w-full max-w-3xl space-y-4">
-                        <div className="text-center space-y-2">
-                            <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-linear-to-r from-purple-400 to-pink-400">
-                                2. Upload Reference Face
+                    {/* Right Column: Execution & Canvas */}
+                    <div className="lg:col-span-8 space-y-6">
+                        {/* 
+                            Note: ScanManager currently holds both the Start button AND the gallery.
+                            For now, placing it here makes it act as the "Canvas".
+                            I've set its width to full so it expands naturally into the large right column. 
+                        */}
+                        <div className="w-full bg-card border border-border rounded-xl shadow-xl min-h-[600px] p-6 lg:p-8">
+                            <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-linear-to-r from-blue-400 to-indigo-400 mb-6">
+                                Neural Interface
                             </h2>
+                            <ScanManager />
                         </div>
-                        <ReferenceUploader />
-                    </div>
-
-                    {/* Step 3: Start Button */}
-                    <div className="w-full max-w-3xl">
-                        <ScanManager />
-                    </div>
-
-                    {/* Step 4: Results */}
-                    <div className="w-full max-w-3xl">
-                        <ResultsGallery />
                     </div>
                 </main>
             </div>

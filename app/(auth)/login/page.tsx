@@ -25,7 +25,7 @@ export default function LoginPage() {
                         <Sparkles className="w-12 h-12 text-blue-500" />
                     </div>
                     <CardTitle className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400">
-                        FaceFinder
+                        PhotoBomb
                     </CardTitle>
                     <CardDescription className="text-slate-400 text-lg">
                         Find yourself in thousands of photos instantly.

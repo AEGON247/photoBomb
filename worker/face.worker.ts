@@ -1,7 +1,5 @@
 /*
-import * as faceapi from 'face-api.js';
-
-// ... (code commented out)
+// import * as faceapi from '@vladmandic/face-api';
 self.onmessage = async (e: MessageEvent) => {
    // ...
 };
