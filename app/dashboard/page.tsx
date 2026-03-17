@@ -15,7 +15,7 @@ export default function DashboardPage() {
     const { logout, user } = useAuthStore();
     const { loadFeedback } = useFeedbackStore();
 
-    // Load user's custom AI feedback data on mount
+    
     useEffect(() => {
         if (user) {
             loadFeedback();
@@ -37,14 +37,14 @@ export default function DashboardPage() {
                 </header>
                 <main className="max-w-[1600px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 mt-8 pb-24">
 
-                    {/* Left Column: Control Panel */}
+                    
                     <div className="lg:col-span-4 space-y-6">
                         <div className="bg-card border border-border rounded-xl p-6 shadow-xl relative overflow-hidden">
-                            {/* Decorative background glow */}
+                            
                             <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 blur-[50px] rounded-full pointer-events-none" />
 
                             <div className="space-y-8 relative z-10">
-                                {/* Step 1: Folder Selection */}
+                                
                                 <div className="space-y-4">
                                     <h2 className="text-lg font-bold flex items-center gap-2">
                                         <span className="bg-primary/20 text-primary w-6 h-6 rounded-full flex items-center justify-center text-sm">1</span>
@@ -55,7 +55,7 @@ export default function DashboardPage() {
 
                                 <div className="h-px w-full bg-border" />
 
-                                {/* Step 2: Face Reference */}
+                                
                                 <div className="space-y-4">
                                     <h2 className="text-lg font-bold flex items-center gap-2">
                                         <span className="bg-primary/20 text-primary w-6 h-6 rounded-full flex items-center justify-center text-sm">2</span>
@@ -67,13 +67,9 @@ export default function DashboardPage() {
                         </div>
                     </div>
 
-                    {/* Right Column: Execution & Canvas */}
+                    
                     <div className="lg:col-span-8 space-y-6">
-                        {/* 
-                            Note: ScanManager currently holds both the Start button AND the gallery.
-                            For now, placing it here makes it act as the "Canvas".
-                            I've set its width to full so it expands naturally into the large right column. 
-                        */}
+                        
                         <div className="w-full bg-card border border-border rounded-xl shadow-xl min-h-[600px] p-6 lg:p-8">
                             <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-linear-to-r from-blue-400 to-indigo-400 mb-6">
                                 Neural Interface

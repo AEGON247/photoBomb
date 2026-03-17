@@ -39,12 +39,12 @@ export function ScanManager() {
         if (!accessToken || references.length === 0) return;
 
         try {
-            // Get content (blob) and create an image we can run face-api.js on
+            
             const blob = await getFileContent(accessToken, file.id);
             const imageUrl = URL.createObjectURL(blob);
             const imgElement = await faceApiService.createImage(imageUrl);
 
-            // Run face detection + descriptor extraction on ALL faces in the image
+            
             const detections = await faceApiService.detectAllFaces(imgElement);
 
             let bestMatchDistance = 1.0;
@@ -55,7 +55,7 @@ export function ScanManager() {
             for (const detection of detections) {
                 const descriptor = detection.descriptor;
                 if (descriptor) {
-                    // Find the minimum distance across references AND user's confirmed True Positives
+                    
                     let distToTarget = 1.0;
                     for (const ref of references) {
                         const dist = euclideanDistance(ref.descriptor, descriptor);
@@ -66,28 +66,28 @@ export function ScanManager() {
                         if (dist < distToTarget) distToTarget = dist;
                     }
 
-                    // Find the minimum distance across user's confirmed False Positives
+                    
                     let distToFalsePositive = 1.0;
                     for (const fp of falsePositives) {
                         const dist = euclideanDistance(fp, descriptor);
                         if (dist < distToFalsePositive) distToFalsePositive = dist;
                     }
 
-                    // Adaptive Filter Logic
+                    
                     let matched = false;
-                    // If it looks more like a known False Positive than the target, reject it completely
+                    
                     if (distToFalsePositive < distToTarget && distToFalsePositive < 0.55) {
                         matched = false;
                     }
-                    // Otherwise, test against target (relaxing threshold to 0.53 since FP guards are active)
+                    
                     else if (distToTarget < 0.53) {
                         matched = true;
                     }
 
-                    // Keep track of the best match in the picture
+                    
                     if (matched && distToTarget < bestMatchDistance) {
                         bestMatchDistance = distToTarget;
-                        // Map distance to a more intuitive percentage: 0.3 -> ~98%, 0.53 -> ~75%
+                        
                         const mappedScore = 1.0 - ((distToTarget - 0.3) / (0.55 - 0.3)) * 0.25;
                         finalSimilarity = Math.min(0.99, Math.max(0.1, mappedScore));
                         bestDescriptor = descriptor;
@@ -106,12 +106,12 @@ export function ScanManager() {
                     imageUrl: imageUrl
                 });
             } else {
-                URL.revokeObjectURL(imageUrl); // Cleanup the object URL if not matched
+                URL.revokeObjectURL(imageUrl); 
             }
         } catch (error) {
             console.error(`Error processing file ${file.name}`, error);
         } finally {
-            updateProgress(1); // Increment processed
+            updateProgress(1); 
         }
     };
 
@@ -144,13 +144,13 @@ export function ScanManager() {
                 const imageFiles = files.filter((f: any) => f.mimeType?.startsWith("image/"));
                 const subFolders = files.filter((f: any) => f.mimeType === "application/vnd.google-apps.folder");
 
-                // Add subfolders to queue
+                
                 folderQueue.push(...subFolders.map((f: any) => f.id));
 
-                // Update total
+                
                 updateProgress(0, (useScanStore.getState().progress.total || 0) + imageFiles.length);
 
-                // Process images in parallel (with limit)
+                
                 const CONCURRENCY = 4;
                 for (let i = 0; i < imageFiles.length; i += CONCURRENCY) {
                     if (!useScanStore.getState().scanning) break;
@@ -185,7 +185,7 @@ export function ScanManager() {
             </CardHeader>
             <CardContent>
                 <div className="flex flex-col md:flex-row gap-6">
-                    {/* Main Scan UI */}
+                    
                     <div className="flex-1 space-y-6">
                         <div className="space-y-2">
                             <div className="flex justify-between text-sm">
@@ -215,21 +215,21 @@ export function ScanManager() {
                                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mt-4">
                                     {results.map((result, idx) => (
                                         <div key={idx} className="relative group rounded-lg overflow-hidden border border-slate-700 bg-slate-800 flex flex-col hover:border-slate-500 transition-colors">
-                                            {/* Top: Image area with hover state linking to external drive */}
+                                            
                                             <a
                                                 href={`https://drive.google.com/file/d/${result.id}/view`}
                                                 target="_blank"
                                                 rel="noreferrer"
                                                 className="aspect-[3/4] relative block cursor-pointer bg-black overflow-hidden"
                                             >
-                                                {/* Use explicitly loaded blob imageUrl to bypass Google Drive auth 403s on thumbnails */}
+                                                
                                                 <img
                                                     src={result.imageUrl || result.thumbnailLink}
                                                     alt={result.name}
                                                     className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                                                     referrerPolicy="no-referrer"
                                                 />
-                                                {/* Hover Overlay */}
+                                                
                                                 <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
                                                     <span className="text-green-400 font-bold text-xl drop-shadow-md bg-slate-900/50 px-4 py-2 flex items-center justify-center text-center rounded-full border border-green-500/30">
                                                         {Math.round(result.similarity * 100)}% Match
@@ -237,7 +237,7 @@ export function ScanManager() {
                                                 </div>
                                             </a>
 
-                                            {/* Bottom: Action buttons below picture */}
+                                            
                                             <div className="p-2 flex flex-col items-center justify-between gap-1 bg-slate-800">
                                                 <div className="flex gap-4 w-full justify-center pb-1">
                                                     <Button
@@ -247,7 +247,7 @@ export function ScanManager() {
                                                         className={`h-10 w-10 p-0 rounded-full transition-colors ${feedbackState[result.id] === 'correct' ? 'bg-green-600 text-white hover:bg-green-700' : 'text-green-500 hover:bg-green-500/20 hover:text-green-400'}`}
                                                         onClick={(e) => {
                                                             e.preventDefault();
-                                                            useFeedbackStore.getState().addTruePositive(result.descriptor);
+                                                            useFeedbackStore.getState().addTruePositive(result.descriptor, result.id, result.similarity);
                                                             setFeedbackState(prev => ({ ...prev, [result.id]: 'correct' }));
                                                         }}
                                                         title="Mark as Correct (Improve AI)"
@@ -261,7 +261,7 @@ export function ScanManager() {
                                                         className={`h-10 w-10 p-0 rounded-full transition-colors ${feedbackState[result.id] === 'incorrect' ? 'bg-red-600 text-white hover:bg-red-700' : 'text-red-500 hover:bg-red-500/20 hover:text-red-400'}`}
                                                         onClick={(e) => {
                                                             e.preventDefault();
-                                                            useFeedbackStore.getState().addFalsePositive(result.descriptor);
+                                                            useFeedbackStore.getState().addFalsePositive(result.descriptor, result.id, result.similarity);
                                                             setFeedbackState(prev => ({ ...prev, [result.id]: 'incorrect' }));
                                                         }}
                                                         title="Mark as Incorrect (Improve AI)"
@@ -277,7 +277,7 @@ export function ScanManager() {
                         )}
                     </div>
 
-                    {/* Vertical References Sidebar */}
+                    
                     <div className="md:w-32 shrink-0 border-l border-slate-800 pl-6 flex flex-col items-center">
                         <p className="text-xs text-slate-400 uppercase tracking-wider font-semibold mb-4 text-center">References ({references.length})</p>
                         <div className="flex flex-row md:flex-col gap-3 overflow-y-auto max-h-[300px] w-full items-center custom-scrollbar pb-2 md:pb-0 px-1">

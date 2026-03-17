@@ -2,19 +2,19 @@ import { create } from 'zustand';
 
 
 interface ScanResult {
-    id: string; // Drive File ID
+    id: string; 
     name: string;
     thumbnailLink: string;
     similarity: number;
-    descriptor: Float32Array; // Stored so we can submit feedback on it
-    imageUrl?: string; // Local blob URL for bypass auth restriction
+    descriptor: Float32Array; 
+    imageUrl?: string; 
 }
 
 interface ScanState {
     scanning: boolean;
     progress: { total: number; processed: number; matches: number };
     results: ScanResult[];
-    queue: string[]; // File IDs to process
+    queue: string[]; 
     setScanning: (scanning: boolean) => void;
     addResult: (result: ScanResult) => void;
     updateProgress: (processed: number, total?: number) => void;

@@ -29,7 +29,7 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
     }
 
     if (!user) {
-        return null; // Will redirect
+        return null; 
     }
 
     return <>{children}</>;

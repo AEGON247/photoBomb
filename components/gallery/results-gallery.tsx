@@ -11,7 +11,7 @@ export function ResultsGallery() {
 
     if (results.length === 0) return null;
 
-    // Show best matches first
+    
     const sorted = [...results].sort((a, b) => b.similarity - a.similarity);
 
     return (
@@ -24,8 +24,8 @@ export function ResultsGallery() {
                     {sorted.map((result) => (
                     <Card key={result.id} className="bg-slate-900 border-slate-800 overflow-hidden group relative">
                         <div className="aspect-square relative bg-black">
-                            {/* We use specific logic for thumbnail. If thumbnailLink is missing, proper fallback needed. */}
-                            {/* Note: next/image requires domain config. Using standard img for external dynamic domains */}
+                            
+                            
                             <img
                                 src={result.thumbnailLink}
                                 alt={result.name}

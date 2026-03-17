@@ -47,7 +47,7 @@ export function DriveLinkInput() {
         return;
       }
 
-      // Store as the selected root folder for scanning
+      
       setSelectedFolder({
         id: meta.id,
         name: meta.name,

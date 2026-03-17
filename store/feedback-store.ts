@@ -2,15 +2,15 @@ import { create } from 'zustand';
 import { db, auth } from '@/lib/firebase';
 import { collection, addDoc, getDocs, query, where, serverTimestamp } from 'firebase/firestore';
 
-// Store the 128-float descriptors of faces the user explicitly marked as Correct or Incorrect
+
 interface FeedbackState {
     truePositives: Float32Array[];
     falsePositives: Float32Array[];
 
-    addTruePositive: (descriptor: Float32Array) => Promise<void>;
-    addFalsePositive: (descriptor: Float32Array) => Promise<void>;
+    addTruePositive: (descriptor: Float32Array, imageId: string, similarity: number) => Promise<void>;
+    addFalsePositive: (descriptor: Float32Array, imageId: string, similarity: number) => Promise<void>;
 
-    // For bulk-loading from Firestore on login
+    
     loadFeedback: () => Promise<void>;
     clearFeedback: () => void;
 }
@@ -19,15 +19,17 @@ export const useFeedbackStore = create<FeedbackState>((set, get) => ({
     truePositives: [],
     falsePositives: [],
 
-    addTruePositive: async (descriptor) => {
+    addTruePositive: async (descriptor, imageId, similarity) => {
         set((state) => ({ truePositives: [...state.truePositives, descriptor] }));
 
-        // Push to Firestore
+        
         if (auth.currentUser) {
             try {
                 await addDoc(collection(db, "face_feedback"), {
                     userId: auth.currentUser.uid,
                     descriptor: Array.from(descriptor),
+                    imageId,
+                    similarity,
                     isMatch: true,
                     createdAt: serverTimestamp()
                 });
@@ -37,15 +39,17 @@ export const useFeedbackStore = create<FeedbackState>((set, get) => ({
         }
     },
 
-    addFalsePositive: async (descriptor) => {
+    addFalsePositive: async (descriptor, imageId, similarity) => {
         set((state) => ({ falsePositives: [...state.falsePositives, descriptor] }));
 
-        // Push to Firestore
+        
         if (auth.currentUser) {
             try {
                 await addDoc(collection(db, "face_feedback"), {
                     userId: auth.currentUser.uid,
                     descriptor: Array.from(descriptor),
+                    imageId,
+                    similarity,
                     isMatch: false,
                     createdAt: serverTimestamp()
                 });

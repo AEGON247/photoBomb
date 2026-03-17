@@ -1,6 +1,6 @@
 
-// We don't import face-api.js at top level to avoid SSR issues
-// import * as faceapi from '@vladmandic/face-api'; 
+
+
 
 const MODEL_URL = '/models';
 
@@ -19,11 +19,11 @@ class FaceApiService {
         const faceapi = await this.getFaceApi();
 
         try {
-            // Explicitly set the backend and wait for it to be ready
+            
             await faceapi.tf.setBackend('webgl');
             await faceapi.tf.ready();
 
-            // Load SSD Mobilenet V1 instead of Tiny Face Detector for higher accuracy
+            
             await faceapi.loadSsdMobilenetv1Model(MODEL_URL);
             await faceapi.loadFaceLandmarkModel(MODEL_URL);
             await faceapi.loadFaceRecognitionModel(MODEL_URL);
@@ -39,7 +39,7 @@ class FaceApiService {
         if (!this.modelsLoaded) await this.loadModels();
         const faceapi = await this.getFaceApi();
 
-        // Use SSD Mobilenet V1 for much higher accuracy
+        
         const detection = await faceapi.detectSingleFace(image, new faceapi.SsdMobilenetv1Options({ minConfidence: 0.5 }))
             .withFaceLandmarks()
             .withFaceDescriptor();
@@ -56,7 +56,7 @@ class FaceApiService {
             .withFaceDescriptors();
     }
 
-    // Helper to create an HTMLImageElement from a blob/url
+    
     async createImage(url: string): Promise<HTMLImageElement> {
         return new Promise((resolve, reject) => {
             const img = new Image();

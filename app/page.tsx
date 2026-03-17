@@ -16,7 +16,7 @@ export default function LandingPage() {
     setMounted(true);
   }, []);
 
-  // If still authenticating on initial load, show sleek loader
+  
   if (loading || !mounted) {
     return (
       <div className="h-screen w-full flex items-center justify-center bg-background">
@@ -27,10 +27,10 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden flex flex-col">
-      {/* Minimal Grid Background */}
+      
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none" />
 
-      {/* Navbar */}
+      
       <header className="w-full px-8 py-6 flex justify-between items-center z-10 border-b border-border/40 bg-background/80 backdrop-blur-md">
         <div className="flex items-center gap-3">
           <div className="bg-primary text-primary-foreground p-1.5 rounded-sm shadow-md">
@@ -61,7 +61,7 @@ export default function LandingPage() {
         </div>
       </header>
 
-      {/* Hero Section */}
+      
       <main className="flex-1 flex flex-col items-center justify-center text-center px-4 z-10 pt-20 pb-24">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -97,7 +97,7 @@ export default function LandingPage() {
           </div>
         </motion.div>
 
-        {/* Features Grid */}
+        
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

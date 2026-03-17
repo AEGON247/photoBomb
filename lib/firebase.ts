@@ -11,7 +11,7 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-// Initialize Firebase
+
 let app: any;
 let auth: any;
 let googleProvider: any;
@@ -23,7 +23,7 @@ if (typeof window !== 'undefined') {
   googleProvider = new GoogleAuthProvider();
   db = getFirestore(app);
 
-  // Add scopes for Google Drive
+  
   googleProvider.addScope('https://www.googleapis.com/auth/drive');
 }
 

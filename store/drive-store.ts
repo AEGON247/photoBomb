@@ -19,7 +19,7 @@ interface DriveState {
     setSelectedFolder: (folder: DriveFile | null) => void;
     setLoading: (loading: boolean) => void;
     pushBreadcrumb: (id: string, name: string) => void;
-    popBreadcrumb: (id: string) => void; // Pop until this id
+    popBreadcrumb: (id: string) => void; 
     resetBreadcrumbs: () => void;
 }
 
@@ -30,8 +30,8 @@ export const useDriveStore = create<DriveState>((set) => ({
     selectedFolder: null,
     loading: false,
     setCurrentFolder: (id, name) => set((state) => {
-        // Logic to update breadcrumbs handled separately or here?
-        // For simplicity, let's keep it simple.
+        
+        
         return { currentFolderId: id };
     }),
     setFiles: (files) => set({ files }),

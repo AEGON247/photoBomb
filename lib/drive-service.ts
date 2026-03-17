@@ -79,12 +79,9 @@ export const getFileContent = async (accessToken: string, fileId: string) => {
     return response.blob();
 }
 
-/**
- * recursively fetch folders? Or just fetch children of a folder?
- * For the tree view, we likely want to fetch children on demand.
- */
+
 export const listChildren = async (accessToken: string, folderId: string = 'root') => {
-    // q: 'params' in parents and trashed = false
+    
     const query = `'${folderId}' in parents and (mimeType = 'application/vnd.google-apps.folder' or mimeType contains 'image/') and trashed = false`;
     return listFiles(accessToken, query, 100);
 }

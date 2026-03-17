@@ -54,9 +54,9 @@ export function FolderPicker() {
     };
 
     const handleSelectFolder = () => {
-        // Find the current folder object from breadcrumbs or assume current context
-        // Actually, user might want to select a folder from the list OR the current folder.
-        // Let's assume selecting the CURRENT folder they are in.
+        
+        
+        
         const current = breadcrumbs[breadcrumbs.length - 1];
         setGlobalSelectedFolder({ id: current.id, name: current.name, mimeType: 'application/vnd.google-apps.folder' });
     };

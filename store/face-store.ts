@@ -2,7 +2,7 @@ import { create } from 'zustand';
 
 export interface FaceReference {
     descriptor: Float32Array;
-    image: string; // URL or Base64
+    image: string; 
 }
 
 interface FaceState {

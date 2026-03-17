@@ -13,7 +13,7 @@ export function ReferenceUploader() {
     const { references, addReference, removeReference, clearReferences } = useFaceStore();
     const [detecting, setDetecting] = useState(false);
     const [preview, setPreview] = useState<string | null>(null);
-    const [faces, setFaces] = useState<any[]>([]); // Descriptors/Landmarks
+    const [faces, setFaces] = useState<any[]>([]); 
     const [selectedFaceIndex, setSelectedFaceIndex] = useState<number | null>(null);
     const [mode, setMode] = useState<"camera" | "upload">("camera");
     const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -21,7 +21,7 @@ export function ReferenceUploader() {
 
     const MAX_REFERENCES = 3;
 
-    // Start/stop camera when mode changes
+    
     useEffect(() => {
         let currentStream: MediaStream | null = null;
         let isActive = true;
@@ -45,7 +45,7 @@ export function ReferenceUploader() {
                     try {
                         await videoRef.current.play();
                     } catch (playError: any) {
-                        // Ignore AbortError which happens when the play request is interrupted by a new load request
+                        
                         if (playError.name !== 'AbortError') {
                             console.error("Error playing video:", playError);
                         }
@@ -95,9 +95,9 @@ export function ReferenceUploader() {
             setFaces(detections);
 
             if (detections.length === 0) {
-                // No faces found
+                
             } else if (detections.length === 1) {
-                // Auto select if only one
+                
                 setSelectedFaceIndex(0);
             }
         } catch (error) {
@@ -120,7 +120,7 @@ export function ReferenceUploader() {
         const face = faces[selectedFaceIndex];
         addReference(face.descriptor, preview);
 
-        // Reset preview state so they can add another
+        
         setPreview(null);
         setFaces([]);
         setSelectedFaceIndex(null);
@@ -188,7 +188,7 @@ export function ReferenceUploader() {
                                 muted
                                 playsInline
                             />
-                            {/* Gridpoint overlay for scan effect */}
+                            
                             <div className="pointer-events-none absolute inset-0">
                                 <div className="absolute inset-[15%] border-2 border-blue-500/70 rounded-xl shadow-[0_0_40px_rgba(59,130,246,0.7)]" />
                                 <div className="absolute inset-[18%] grid grid-cols-3 grid-rows-3 opacity-40">
@@ -226,7 +226,7 @@ export function ReferenceUploader() {
                                     setSelectedFaceIndex(null);
 
                                     try {
-                                        // face-api supports HTMLCanvasElement as input; cast to any to keep TS happy.
+                                        
                                         const detections = await faceApiService.detectAllFaces(canvas as any);
                                         setFaces(detections || []);
                                         if (detections && detections.length === 1) {
@@ -273,13 +273,13 @@ export function ReferenceUploader() {
                             )}
                             <img src={preview} alt="Preview" className="max-w-full max-h-full" />
 
-                            {/* Face Overlays */}
+                            
                             {!detecting && faces.map((face, index) => {
-                                // face.detection.box gives { x, y, width, height } relative to the image natural size
-                                // We need to map this to the displayed image size. 
-                                // This is tricky without knowing the display size vs natural size ratio.
-                                // For simplicity in this MVP, we might display "Face 1, Face 2" buttons below
-                                // OR we rely on face-api to draw on a canvas.
+                                
+                                
+                                
+                                
+                                
                                 return null;
                             })}
                         </div>

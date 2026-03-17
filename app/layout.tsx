@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
-import { Outfit } from "next/font/google"; // Upgraded to premium tech font
+import { Outfit } from "next/font/google"; 
 import "./globals.css";
+import { SplashScreen } from "@/components/ui/splash-screen";
+import { GuidelinesModal } from "@/components/ui/guidelines-modal";
+import { Footer } from "@/components/ui/footer";
 
 const outfit = Outfit({ subsets: ["latin"] });
 
@@ -16,7 +19,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
-      <body className={outfit.className}>{children}</body>
+      <body className={outfit.className}>
+        <SplashScreen>
+          <GuidelinesModal />
+          {children}
+          <Footer />
+        </SplashScreen>
+      </body>
     </html>
   );
 }
