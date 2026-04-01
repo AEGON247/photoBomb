@@ -11,6 +11,17 @@ const spaceGrotesk = Space_Grotesk({ subsets: ["latin"], weight: ["400", "700"],
 export const metadata: Metadata = {
   title: "PhotoBomb AI",
   description: "Find your face in thousands of photos instantly using Machine Learning.",
+  openGraph: {
+    images: ["/logoPNG.png"],
+    title: "PhotoBomb AI",
+    description: "Find your face in thousands of photos instantly using Machine Learning.",
+  },
+  twitter: {
+    card: "summary_large_image",
+    images: ["/logoPNG.png"],
+    title: "PhotoBomb AI",
+    description: "Find your face in thousands of photos instantly using Machine Learning.",
+  }
 };
 
 export default function RootLayout({
