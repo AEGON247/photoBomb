@@ -138,11 +138,11 @@ export function ReferenceUploader() {
     };
 
     return (
-        <Card className="w-full max-w-xl mx-auto bg-slate-900 border-slate-800">
-            <CardHeader>
-                <div className="flex items-center justify-between">
-                    <CardTitle className="text-slate-100">Choose Reference Face</CardTitle>
-                    <div className="inline-flex rounded-full bg-slate-800 p-1 text-xs">
+        <Card className="w-full max-w-xl mx-auto comic-panel bg-card">
+            <CardHeader className="border-b-[4px] border-foreground bg-background pb-4">
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <CardTitle className="font-display font-black uppercase text-xl text-foreground">Identify Target</CardTitle>
+                    <div className="inline-flex border-[3px] border-foreground bg-background p-1 text-xs font-bold uppercase tracking-widest shadow-[2px_2px_0_0_var(--color-foreground)]">
                         <button
                             type="button"
                             onClick={() => {
@@ -151,13 +151,13 @@ export function ReferenceUploader() {
                                 setFaces([]);
                                 setSelectedFaceIndex(null);
                             }}
-                            className={`px-3 py-1 rounded-full transition-colors flex items-center gap-1 ${mode === "camera"
-                                ? "bg-blue-600 text-white"
-                                : "text-slate-300 hover:text-white"
+                            className={`px-4 py-1.5 transition-all flex items-center gap-2 ${mode === "camera"
+                                ? "bg-primary text-foreground border-[2px] border-foreground shadow-[2px_2px_0_0_var(--color-foreground)] -translate-y-[1px]"
+                                : "text-foreground/70 hover:text-foreground"
                                 }`}
                         >
-                            <Camera className="w-3 h-3" />
-                            Live scan
+                            <Camera className="w-4 h-4" />
+                            Scanner
                         </button>
                         <button
                             type="button"
@@ -167,20 +167,21 @@ export function ReferenceUploader() {
                                 setFaces([]);
                                 setSelectedFaceIndex(null);
                             }}
-                            className={`px-3 py-1 rounded-full transition-colors ${mode === "upload"
-                                ? "bg-blue-600 text-white"
-                                : "text-slate-300 hover:text-white"
+                            className={`px-4 py-1.5 transition-all flex items-center gap-2 ${mode === "upload"
+                                ? "bg-primary text-foreground border-[2px] border-foreground shadow-[2px_2px_0_0_var(--color-foreground)] -translate-y-[1px]"
+                                : "text-foreground/70 hover:text-foreground"
                                 }`}
                         >
+                            <Upload className="w-4 h-4" />
                             Upload
                         </button>
                     </div>
                 </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="pt-6">
                 {mode === "camera" && (
-                    <div className={`space-y-4 ${preview ? 'hidden' : 'block'}`}>
-                        <div className="relative rounded-lg overflow-hidden bg-black h-72 flex items-center justify-center">
+                    <div className={`space-y-6 ${preview ? 'hidden' : 'block'}`}>
+                        <div className="relative border-[4px] border-foreground shadow-[8px_8px_0_0_var(--color-foreground)] bg-black h-72 flex items-center justify-center -rotate-1">
                             <video
                                 ref={videoRef}
                                 className="w-full h-full object-cover"
@@ -190,20 +191,21 @@ export function ReferenceUploader() {
                             />
                             
                             <div className="pointer-events-none absolute inset-0">
-                                <div className="absolute inset-[15%] border-2 border-blue-500/70 rounded-xl shadow-[0_0_40px_rgba(59,130,246,0.7)]" />
+                                <div className="absolute inset-[15%] border-[4px] border-primary" />
                                 <div className="absolute inset-[18%] grid grid-cols-3 grid-rows-3 opacity-40">
                                     {Array.from({ length: 9 }).map((_, i) => (
                                         <div
                                             key={i}
-                                            className="border border-blue-400/40"
+                                            className="border-2 border-primary/50"
                                         />
                                     ))}
                                 </div>
                             </div>
                         </div>
-                        <div className="flex justify-center">
+                        <div className="flex justify-center pt-2">
                             <Button
                                 type="button"
+                                size="lg"
                                 onClick={async () => {
                                     if (!videoRef.current) return;
                                     const video = videoRef.current;
@@ -226,7 +228,6 @@ export function ReferenceUploader() {
                                     setSelectedFaceIndex(null);
 
                                     try {
-                                        
                                         const detections = await faceApiService.detectAllFaces(canvas as any);
                                         setFaces(detections || []);
                                         if (detections && detections.length === 1) {
@@ -238,10 +239,10 @@ export function ReferenceUploader() {
                                         setDetecting(false);
                                     }
                                 }}
-                                className="bg-blue-600 hover:bg-blue-700"
+                                className="rotate-2"
                             >
-                                <Camera className="w-4 h-4 mr-2" />
-                                Capture face
+                                <Camera className="w-5 h-5 mr-2" />
+                                Capture Target
                             </Button>
                         </div>
                         <canvas ref={canvasRef} className="hidden" />
@@ -250,62 +251,52 @@ export function ReferenceUploader() {
                 {!preview && mode === "upload" && (
                     <div
                         {...getRootProps()}
-                        className={`border-2 border-dashed rounded-lg p-10 flex flex-col items-center justify-center cursor-pointer transition-colors ${isDragActive
-                            ? "border-blue-500 bg-blue-500/10"
-                            : "border-slate-700 hover:border-slate-600"
+                        className={`border-[4px] border-dashed p-10 flex flex-col items-center justify-center cursor-pointer transition-all ${isDragActive
+                            ? "border-foreground bg-primary/20 shadow-comic"
+                            : "border-foreground bg-background hover:bg-primary/5 shadow-comic-sm"
                             }`}
                     >
                         <input {...getInputProps()} />
-                        <Upload className="w-10 h-10 text-slate-500 mb-4" />
-                        <p className="text-slate-400 text-center">
-                            Drag & drop a photo of the person you want to find, or click to select.
+                        <Upload className="w-12 h-12 text-foreground mb-4" />
+                        <p className="text-foreground font-bold uppercase tracking-wider text-center max-w-xs">
+                            Drop a photo of the target or click here
                         </p>
                     </div>
                 )}
                 {preview && (
-                    <div className="space-y-4">
-                        <div className="relative rounded-lg overflow-hidden max-h-[400px] flex items-center justify-center bg-black">
+                    <div className="space-y-6">
+                        <div className="relative border-[4px] border-foreground shadow-[8px_8px_0_0_var(--color-primary)] overflow-hidden max-h-[400px] flex items-center justify-center bg-black rotate-1">
                             {detecting && (
-                                <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-10">
-                                    <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
-                                    <span className="ml-2 font-medium text-white">Scanning for faces...</span>
+                                <div className="absolute inset-0 bg-background/80 flex flex-col items-center justify-center z-10 space-y-4">
+                                    <Loader2 className="w-12 h-12 animate-spin text-primary" />
+                                    <span className="font-display font-black uppercase tracking-widest text-foreground text-xl">Analyzing...</span>
                                 </div>
                             )}
-                            <img src={preview} alt="Preview" className="max-w-full max-h-full" />
-
-                            
-                            {!detecting && faces.map((face, index) => {
-                                
-                                
-                                
-                                
-                                
-                                return null;
-                            })}
+                            <img src={preview as string} alt="Preview" className="max-w-full max-h-full" />
                         </div>
 
                         {!detecting && faces.length === 0 && (
-                            <div className="text-red-400 text-center flex items-center justify-center gap-2">
-                                <X className="w-4 h-4" /> No faces detected. Try another photo.
+                            <div className="border-[3px] border-destructive bg-destructive/10 p-4 text-center flex items-center justify-center gap-2 text-destructive font-bold uppercase tracking-wider shadow-comic-sm mt-4">
+                                <X className="w-5 h-5" /> Target not found. Scan again.
                             </div>
                         )}
 
                         {!detecting && faces.length > 0 && (
-                            <div className="space-y-2">
-                                <p className="text-sm text-slate-400 text-center">
-                                    {faces.length} face{faces.length > 1 ? 's' : ''} detected.
-                                    {faces.length > 1 ? ' Select the one to search for:' : ' Confirm selection:'}
+                            <div className="space-y-4 bg-background border-[3px] border-foreground p-4 shadow-comic-sm">
+                                <p className="font-display font-black uppercase text-center text-foreground">
+                                    {faces.length} Identity Signature{faces.length > 1 ? 's' : ''} detected.
+                                    {faces.length > 1 ? ' Select Target:' : ' Confirm Target:'}
                                 </p>
-                                <div className="flex justify-center gap-2 flex-wrap">
+                                <div className="flex justify-center gap-3 flex-wrap">
                                     {faces.map((face, idx) => (
                                         <Button
                                             key={idx}
                                             variant={selectedFaceIndex === idx ? "default" : "outline"}
-                                            className={selectedFaceIndex === idx ? "bg-blue-600" : "border-slate-700"}
                                             onClick={() => setSelectedFaceIndex(idx)}
+                                            className={selectedFaceIndex === idx ? "-translate-y-1 shadow-comic-sm" : ""}
                                         >
                                             <User className="w-4 h-4 mr-2" />
-                                            Face {idx + 1}
+                                            Identity {idx + 1}
                                         </Button>
                                     ))}
                                 </div>
@@ -315,10 +306,10 @@ export function ReferenceUploader() {
                 )}
             </CardContent>
             {preview && !detecting && faces.length > 0 && (
-                <CardFooter className="flex justify-between border-t border-slate-800 pt-4">
-                    <Button variant="ghost" onClick={resetPreview} className="text-slate-400">Cancel</Button>
-                    <Button onClick={confirmSelection} disabled={selectedFaceIndex === null} className="bg-blue-600 hover:bg-blue-700">
-                        Use This Face
+                <CardFooter className="flex justify-between border-t-[4px] border-foreground pt-4 bg-background">
+                    <Button variant="ghost" onClick={resetPreview} className="font-bold uppercase tracking-widest">Cancel</Button>
+                    <Button onClick={confirmSelection} disabled={selectedFaceIndex === null} size="lg">
+                        Confirm Target
                     </Button>
                 </CardFooter>
             )}

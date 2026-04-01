@@ -1,5 +1,7 @@
-
 const DRIVE_API_BASE = 'https://www.googleapis.com/drive/v3';
+
+// Use the Firebase API key for Google APIs. Alternatively, developers can specify a dedicated Google Drive API key.
+const getApiKey = () => process.env.NEXT_PUBLIC_GOOGLE_DRIVE_API_KEY || process.env.NEXT_PUBLIC_FIREBASE_API_KEY;
 
 export interface DriveFile {
     id: string;
@@ -9,7 +11,7 @@ export interface DriveFile {
     parents?: string[];
 }
 
-export const listFiles = async (accessToken: string, query: string, pageSize: number = 100, pageToken?: string) => {
+export const listFiles = async (query: string, pageSize: number = 100, pageToken?: string) => {
     const params = new URLSearchParams({
         q: query,
         fields: 'nextPageToken, files(id, name, mimeType, thumbnailLink, parents)',
@@ -17,6 +19,7 @@ export const listFiles = async (accessToken: string, query: string, pageSize: nu
         orderBy: 'folder,name',
         includeItemsFromAllDrives: 'true',
         supportsAllDrives: 'true',
+        key: getApiKey() || '',
     });
 
     if (pageToken) {
@@ -25,7 +28,6 @@ export const listFiles = async (accessToken: string, query: string, pageSize: nu
 
     const response = await fetch(`${DRIVE_API_BASE}/files?${params.toString()}`, {
         headers: {
-            Authorization: `Bearer ${accessToken}`,
             'Content-Type': 'application/json',
         },
     });
@@ -37,16 +39,16 @@ export const listFiles = async (accessToken: string, query: string, pageSize: nu
     return response.json();
 };
 
-export const getFileMetadata = async (accessToken: string, fileId: string): Promise<DriveFile> => {
+export const getFileMetadata = async (fileId: string): Promise<DriveFile> => {
     const params = new URLSearchParams({
         fields: "id,name,mimeType,thumbnailLink,parents",
         includeItemsFromAllDrives: "true",
         supportsAllDrives: "true",
+        key: getApiKey() || '',
     });
 
     const response = await fetch(`${DRIVE_API_BASE}/files/${fileId}?${params.toString()}`, {
         headers: {
-            Authorization: `Bearer ${accessToken}`,
             "Content-Type": "application/json",
         },
     });
@@ -65,12 +67,10 @@ export const getFileMetadata = async (accessToken: string, fileId: string): Prom
     return response.json();
 };
 
-export const getFileContent = async (accessToken: string, fileId: string) => {
-    const response = await fetch(`${DRIVE_API_BASE}/files/${fileId}?alt=media`, {
-        headers: {
-            Authorization: `Bearer ${accessToken}`,
-        },
-    });
+export const getFileContent = async (fileId: string) => {
+    
+    
+    const response = await fetch(`/api/drive?fileId=${fileId}`);
 
     if (!response.ok) {
         throw new Error(`Drive Download Error: ${response.status}`);
@@ -79,9 +79,8 @@ export const getFileContent = async (accessToken: string, fileId: string) => {
     return response.blob();
 }
 
-
-export const listChildren = async (accessToken: string, folderId: string = 'root') => {
-    
+export const listChildren = async (folderId: string = 'root') => {
+    // Only fetch folders and images
     const query = `'${folderId}' in parents and (mimeType = 'application/vnd.google-apps.folder' or mimeType contains 'image/') and trashed = false`;
-    return listFiles(accessToken, query, 100);
+    return listFiles(query, 100);
 }

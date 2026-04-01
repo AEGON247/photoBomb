@@ -24,55 +24,44 @@ export default function DashboardPage() {
 
     return (
         <AuthGuard>
-            <div className="min-h-screen bg-slate-950 text-slate-100 p-8">
-                <header className="flex justify-between items-center mb-8 border-b border-slate-800 pb-4">
+            <div className="min-h-screen bg-halftone text-foreground p-4 md:p-8 font-sans">
+                <header className="flex justify-between items-center mb-8 border-b-4 border-foreground pb-4 bg-background p-4 shadow-comic-sm">
                     <div>
-                        <h1 className="text-2xl font-bold">Dashboard</h1>
-                        <p className="text-slate-400">Welcome, {user?.displayName}</p>
+                        <h1 className="text-3xl font-display font-black uppercase tracking-tight">Scanner Dashboard</h1>
+                        <p className="text-foreground/80 font-bold uppercase tracking-widest text-sm">Operative: {user?.displayName}</p>
                     </div>
-                    <Button variant="outline" onClick={logout} className="border-slate-700 hover:bg-slate-800">
+                    <Button variant="outline" onClick={logout} className="border-[3px]">
                         <LogOut className="mr-2 h-4 w-4" />
                         Sign Out
                     </Button>
                 </header>
                 <main className="max-w-[1600px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 mt-8 pb-24">
-
-                    
                     <div className="lg:col-span-4 space-y-6">
-                        <div className="bg-card border border-border rounded-xl p-6 shadow-xl relative overflow-hidden">
-                            
-                            <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 blur-[50px] rounded-full pointer-events-none" />
+                        <div className="comic-panel p-6 relative overflow-hidden flex flex-col gap-8">
+                            <div className="space-y-4">
+                                <h2 className="text-xl font-display font-black uppercase flex items-center gap-3">
+                                    <span className="bg-primary text-foreground border-2 border-foreground shadow-[2px_2px_0_0_var(--color-foreground)] w-8 h-8 flex items-center justify-center text-lg -rotate-3">1</span>
+                                    Target Source
+                                </h2>
+                                <DriveLinkInput />
+                            </div>
 
-                            <div className="space-y-8 relative z-10">
-                                
-                                <div className="space-y-4">
-                                    <h2 className="text-lg font-bold flex items-center gap-2">
-                                        <span className="bg-primary/20 text-primary w-6 h-6 rounded-full flex items-center justify-center text-sm">1</span>
-                                        Target Folder
-                                    </h2>
-                                    <DriveLinkInput />
-                                </div>
+                            <div className="h-[4px] w-full bg-foreground my-2" />
 
-                                <div className="h-px w-full bg-border" />
-
-                                
-                                <div className="space-y-4">
-                                    <h2 className="text-lg font-bold flex items-center gap-2">
-                                        <span className="bg-primary/20 text-primary w-6 h-6 rounded-full flex items-center justify-center text-sm">2</span>
-                                        Reference Face
-                                    </h2>
-                                    <ReferenceUploader />
-                                </div>
+                            <div className="space-y-4">
+                                <h2 className="text-xl font-display font-black uppercase flex items-center gap-3">
+                                    <span className="bg-primary text-foreground border-2 border-foreground shadow-[2px_2px_0_0_var(--color-foreground)] w-8 h-8 flex items-center justify-center text-lg rotate-3">2</span>
+                                    Reference Identity
+                                </h2>
+                                <ReferenceUploader />
                             </div>
                         </div>
                     </div>
 
-                    
                     <div className="lg:col-span-8 space-y-6">
-                        
-                        <div className="w-full bg-card border border-border rounded-xl shadow-xl min-h-[600px] p-6 lg:p-8">
-                            <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-linear-to-r from-blue-400 to-indigo-400 mb-6">
-                                Neural Interface
+                        <div className="w-full comic-panel min-h-[600px] p-6 lg:p-8">
+                            <h2 className="text-3xl font-display font-black uppercase mb-8 border-b-[4px] border-foreground pb-2 inline-block">
+                                Neural processing unit
                             </h2>
                             <ScanManager />
                         </div>

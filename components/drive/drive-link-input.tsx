@@ -13,7 +13,6 @@ import { useRouter } from "next/navigation";
 
 export function DriveLinkInput() {
   const router = useRouter();
-  const { accessToken } = useAuthStore();
   const { setSelectedFolder, setCurrentFolder } = useDriveStore();
 
   const [link, setLink] = useState("");
@@ -22,11 +21,6 @@ export function DriveLinkInput() {
   const [resolvedName, setResolvedName] = useState<string | null>(null);
 
   const handleApply = async () => {
-    if (!accessToken) {
-      router.push("/login");
-      return;
-    }
-
     const parsed = parseDriveLink(link);
     if (!parsed) {
       setStatus("error");
@@ -38,7 +32,7 @@ export function DriveLinkInput() {
     setMessage("Validating link with Google Drive...");
 
     try {
-      const meta = await getFileMetadata(accessToken, parsed.id);
+      const meta = await getFileMetadata(parsed.id);
       const isFolder = meta.mimeType === "application/vnd.google-apps.folder";
 
       if (!isFolder) {
@@ -63,35 +57,35 @@ export function DriveLinkInput() {
     } catch (error) {
       console.error("Failed to validate Drive link", error);
       setStatus("error");
-      setMessage("Google Drive wouldn't let us access this link. Make sure it's shared with your Google account and try again.");
+      setMessage("Access denied. Make sure you changed the folder sharing settings to 'Anyone with the link can view' before pasting the link.");
     }
   };
 
   const disabled = !link.trim();
 
   return (
-    <Card className="w-full max-w-3xl mx-auto bg-slate-900 border-slate-800 text-slate-100">
+    <Card className="w-full mx-auto comic-panel bg-card">
       <CardHeader>
-        <CardTitle className="text-lg flex items-center gap-2">
-          <span className="text-blue-400">Paste Google Drive folder link</span>
+        <CardTitle className="text-xl font-display font-black uppercase flex items-center gap-2">
+          <span className="text-foreground">Paste Google Drive folder link</span>
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-3">
-        <p className="text-sm text-slate-400">
-          Share a Google Drive folder with the Google account you use to sign in, then paste its link here. We'll scan all images inside that folder and its subfolders.
+      <CardContent className="space-y-4">
+        <p className="text-sm font-medium text-foreground/80">
+          Right-click a Google Drive folder, change sharing to <strong className="text-primary font-black uppercase tracking-wider">"Anyone with the link can view"</strong>, and paste the link below. No login required!
         </p>
         <div className="flex flex-col md:flex-row gap-3">
           <Input
             placeholder="https://drive.google.com/drive/folders/..."
             value={link}
             onChange={(e) => setLink(e.target.value)}
-            className="bg-slate-950 border-slate-800 text-slate-100"
+            className="flex-1"
           />
           <Button
             type="button"
             onClick={handleApply}
             disabled={disabled || status === "validating"}
-            className="md:w-40 bg-blue-600 hover:bg-blue-700"
+            className="md:w-48"
           >
             {status === "validating" ? (
               <span className="flex items-center gap-2">
@@ -107,21 +101,21 @@ export function DriveLinkInput() {
           </Button>
         </div>
         {resolvedName && status === "ready" && (
-          <div className="flex items-center gap-2 text-sm text-emerald-400">
-            <CheckCircle2 className="w-4 h-4" />
-            <span>Selected folder: <span className="font-semibold">{resolvedName}</span></span>
+          <div className="flex items-center gap-2 text-sm text-primary font-bold uppercase tracking-wider mt-2 border-2 border-primary p-2 bg-primary/10">
+            <CheckCircle2 className="w-5 h-5 flex-shrink-0" />
+            <span>Selected folder: <span className="font-black text-foreground">{resolvedName}</span></span>
           </div>
         )}
         {message && status !== "ready" && (
-          <div className="flex items-center gap-2 text-sm text-amber-400">
-            <AlertCircle className="w-4 h-4" />
+          <div className="flex items-start gap-2 text-sm text-destructive font-bold uppercase tracking-wider mt-2 border-2 border-destructive p-2 bg-destructive/10">
+            <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
             <span>{message}</span>
           </div>
         )}
       </CardContent>
-      <CardFooter className="border-t border-slate-800 text-xs text-slate-500 flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-        <span>Tip: You can create a dedicated Drive folder for all photos you want PhotoBomb to search.</span>
-        <span>Only folders you can already access via your Google account can be scanned.</span>
+      <CardFooter className="border-t-[4px] border-foreground pt-4 text-xs font-bold uppercase text-foreground/60 flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+        <span>Tip: You can create a dedicated Public Drive folder for all photos you want to scan.</span>
+        <span>Only folders set to "Anyone with the link" can be scanned.</span>
       </CardFooter>
     </Card>
   );

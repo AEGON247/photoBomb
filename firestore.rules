@@ -1,18 +1,43 @@
-rules_version='2'
+rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
+
+    // ── face_feedback ────────────────────────────────────────────────────────
+    // The only collection the app writes to.
+    // All operations are restricted to the document's owner (authenticated user).
+    match /face_feedback/{docId} {
+
+      // READ: only the owner can read their own feedback documents.
+      allow read: if request.auth != null
+                  && resource.data.userId == request.auth.uid;
+
+      // CREATE: caller must be authenticated; the new doc's userId must match
+      // the caller's uid; all required fields must be present and typed correctly.
+      allow create: if request.auth != null
+                    && request.resource.data.userId == request.auth.uid
+                    && request.resource.data.keys().hasAll([
+                         'userId', 'descriptor', 'imageId',
+                         'similarity', 'isMatch', 'createdAt'
+                       ])
+                    && request.resource.data.descriptor is list
+                    && request.resource.data.imageId   is string
+                    && request.resource.data.similarity is number
+                    && request.resource.data.isMatch    is bool;
+
+      // UPDATE: owner only; userId field may not be changed.
+      allow update: if request.auth != null
+                    && resource.data.userId          == request.auth.uid
+                    && request.resource.data.userId  == request.auth.uid;
+
+      // DELETE: owner only.
+      allow delete: if request.auth != null
+                    && resource.data.userId == request.auth.uid;
+    }
+
+    // ── catch-all: deny everything else ──────────────────────────────────────
     match /{document=**} {
-      // This rule allows anyone with your database reference to view, edit,
-      // and delete all data in your database. It is useful for getting
-      // started, but it is configured to expire after 30 days because it
-      // leaves your app open to attackers. At that time, all client
-      // requests to your database will be denied.
-      //
-      // Make sure to write security rules for your app before that time, or
-      // else all client requests to your database will be denied until you
-      // update your rules.
-      allow read, write: if request.time < timestamp.date(2026, 3, 26);
+      allow read, write: if false;
     }
   }
 }

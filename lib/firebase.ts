@@ -23,8 +23,9 @@ if (typeof window !== 'undefined') {
   googleProvider = new GoogleAuthProvider();
   db = getFirestore(app);
 
-  
-  googleProvider.addScope('https://www.googleapis.com/auth/drive');
+  // Drive scope removed so App isn't marked Restricted and avoids $15k Audit!
+  // We use public folder links and API keys.
+  // googleProvider.addScope('https://www.googleapis.com/auth/drive');
 }
 
 export { app, auth, googleProvider, db };
